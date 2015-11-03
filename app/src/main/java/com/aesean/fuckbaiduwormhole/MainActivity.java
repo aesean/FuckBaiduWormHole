@@ -51,8 +51,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (CheckWormHole.isDangerous(resultCode)) {
                     tv_Result.setText(R.string.Dangerous);
                     tv_Result.setTextColor(getResources().getColor(R.color.Dangerous));
-
                     tv_ResultDetail.setText(tv_ResultDetail.getText().toString() + CheckWormHole.NEW_LINE + url);
+                } else {
+                    tv_Result.setText(R.string.Safe);
+                    tv_Result.setTextColor(getResources().getColor(R.color.Safe));
+                    tv_ResultDetail.setText("");
                 }
             }
         });
