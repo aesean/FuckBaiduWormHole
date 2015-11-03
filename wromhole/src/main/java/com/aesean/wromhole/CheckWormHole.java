@@ -26,10 +26,6 @@ public class CheckWormHole {
     public static final int CODE_SAFE = HttpURLConnection.HTTP_NOT_FOUND;
     public static final int CODE_DANGEROUS = HttpURLConnection.HTTP_OK;
 
-    // 偷懒了，这里应该写进xml的。
-    public static final String MESSAGE_SAFE = "安全";
-    public static final String MESSAGE_DANGEROUS = "危险";
-
     /**
      * 线程池
      */
@@ -66,6 +62,8 @@ public class CheckWormHole {
 
     public static final String WORMHOLE_URL0 = "http://127.0.0.1:40310/daemon";
     public static final String WORMHOLE_URL1 = "http://127.0.0.1:6259/daemon";
+    public static final String WORMHOLE_URL2 = "http://127.0.0.1:40310";
+    public static final String WORMHOLE_URL3 = "http://127.0.0.1:6259";
 
     /**
      * 获取默认的WormHole Url List
@@ -74,8 +72,10 @@ public class CheckWormHole {
      */
     public static List<String> getDefaultUrlList() {
         List<String> list = new ArrayList<>();
-        list.add(WORMHOLE_URL0);
-        list.add(WORMHOLE_URL1);
+//        list.add(WORMHOLE_URL0);
+//        list.add(WORMHOLE_URL1);
+        list.add(WORMHOLE_URL2);
+        list.add(WORMHOLE_URL3);
         return list;
     }
 
@@ -95,7 +95,7 @@ public class CheckWormHole {
                     url = new URL(urlStr);
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
-                    sendCallback(callback, urlStr, CODE_SAFE, MESSAGE_SAFE);
+                    sendCallback(callback, urlStr, CODE_SAFE, null);
                     return;
                 }
                 HttpURLConnection conn;
@@ -116,7 +116,7 @@ public class CheckWormHole {
                     sendCallback(callback, urlStr, conn.getResponseCode(), stringBuilder.toString());
                 } catch (IOException e) {
                     e.printStackTrace();
-                    sendCallback(callback, urlStr, CODE_SAFE, MESSAGE_SAFE);
+                    sendCallback(callback, urlStr, CODE_SAFE, null);
                 } finally {
                     if (reader != null) {
                         try {
@@ -139,10 +139,12 @@ public class CheckWormHole {
 
     /**
      * 通过返回网页结果识别当前到底是什么应用有危险。
+     * 判断逻辑有问题，并不是所有百度产品都有daemon页面，所以暂时废弃使用。
      *
      * @param message 网页返回结果
      * @return 危险应用列表
      */
+    @Deprecated
     public static List<String> getAppName(String message) {
         String[] split = message.split(",");
         List<String> list = new ArrayList<>();
@@ -204,7 +206,7 @@ public class CheckWormHole {
          *
          * @param url        检测的url
          * @param resultCode 返回值，理论上返回只要不是{@link HttpURLConnection#HTTP_NOT_FOUND}都可能存在危险，实际测试百度后门返回是{@link HttpURLConnection#HTTP_OK}
-         * @param message    返回附加消息
+         * @param message    返回页面内容
          */
         void wormHoleCheckResult(String url, int resultCode, String message);
     }

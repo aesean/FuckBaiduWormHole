@@ -2,7 +2,9 @@
     <string name="app_name">FuckBaiduWormHole</string>
     <string name="action_settings">Settings</string>
     <string name="ClickCheck">点击检测百度WormHole后门</string>
-    <string name="CheckResult">检测：</string>
+    <string name="Check">详细信息：</string>
+    <string name="CheckResult">检测结果：</string>
     <string name="CheckResultApp">有危险的APP：</string>
-    <string name="NotFound">没有发现危险APP</string>
+    <string name="Safe">安全，没有发现百度后门</string>
+    <string name="Dangerous">危险！发现百度后门</string>
 </resources>

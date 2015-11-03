@@ -22,37 +22,29 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:text="@string/CheckResult"
         android:textSize="20sp" />
 
-    <TextView
-        android:id="@+id/tv_Result1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/CheckResult" />
 
     <TextView
-        android:id="@+id/tv_Result2"
+        android:id="@+id/tv_Result"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/CheckResult" />
+        android:text="@string/Safe"
+        android:textColor="@color/Safe" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="@string/CheckResultApp"
+        android:text="@string/Check"
         android:textSize="20sp" />
 
-    <ScrollView
+    <TextView
+        android:id="@+id/tv_ResultDetail"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content" />
 
-        <TextView
-            android:id="@+id/tv_ResultApp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/NotFound"
-            android:textColor="#FF00FF00" />
-    </ScrollView>
+
 </LinearLayout>
