@@ -72,8 +72,8 @@ public class CheckWormHole {
      */
     public static List<String> getDefaultUrlList() {
         List<String> list = new ArrayList<>();
-//        list.add(WORMHOLE_URL0);
-//        list.add(WORMHOLE_URL1);
+        list.add(WORMHOLE_URL0);
+        list.add(WORMHOLE_URL1);
         list.add(WORMHOLE_URL2);
         list.add(WORMHOLE_URL3);
         return list;
@@ -82,7 +82,7 @@ public class CheckWormHole {
     /**
      * 关闭线程池
      */
-    public void shutdown() {
+    public static void shutdown() {
         mExec.shutdown();
     }
 
@@ -107,13 +107,16 @@ public class CheckWormHole {
                     conn.setDoOutput(true);
                     conn.connect();
                     StringBuilder stringBuilder = new StringBuilder();
-                    inputStreamReader = new InputStreamReader(conn.getInputStream());
-                    reader = new BufferedReader(inputStreamReader);
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        stringBuilder.append(line).append(NEW_LINE);
+                    int responseCode = conn.getResponseCode();
+                    if (responseCode != HttpURLConnection.HTTP_NOT_FOUND) {
+                        inputStreamReader = new InputStreamReader(conn.getInputStream());
+                        reader = new BufferedReader(inputStreamReader);
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            stringBuilder.append(line).append(NEW_LINE);
+                        }
                     }
-                    sendCallback(callback, urlStr, conn.getResponseCode(), stringBuilder.toString());
+                    sendCallback(callback, urlStr, responseCode, stringBuilder.toString());
                 } catch (IOException e) {
                     e.printStackTrace();
                     sendCallback(callback, urlStr, CODE_SAFE, null);
