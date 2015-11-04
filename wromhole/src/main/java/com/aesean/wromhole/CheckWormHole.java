@@ -51,6 +51,7 @@ public class CheckWormHole {
     public static final String WORMHOLE_URL1 = "http://127.0.0.1:6259/daemon";
     public static final String WORMHOLE_URL2 = "http://127.0.0.1:40310";
     public static final String WORMHOLE_URL3 = "http://127.0.0.1:6259";
+    public static final String WORMHOLE_URL4 = "http://127.0.0.1:7777";
 
     /**
      * 线程池
@@ -95,6 +96,7 @@ public class CheckWormHole {
         list.add(WORMHOLE_URL1);
         list.add(WORMHOLE_URL2);
         list.add(WORMHOLE_URL3);
+        list.add(WORMHOLE_URL4);
         return list;
     }
 
