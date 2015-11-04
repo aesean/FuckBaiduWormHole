@@ -18,6 +18,7 @@ package com.aesean.wromhole;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,6 +26,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,19 +37,25 @@ import java.util.concurrent.Executors;
 /**
  * 检测WormHole工具类
  */
-@SuppressWarnings("unused")
+//@SuppressWarnings("unused")
 public class CheckWormHole {
+    private static final String TAG = CheckWormHole.class.getName();
+    private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
+
     public static final String NEW_LINE = System.getProperty("line.separator");
 
     public static final int CODE_SAFE = HttpURLConnection.HTTP_NOT_FOUND;
     public static final int CODE_DANGEROUS = HttpURLConnection.HTTP_OK;
 
+    public static final String WORMHOLE_URL0 = "http://127.0.0.1:40310/daemon";
+    public static final String WORMHOLE_URL1 = "http://127.0.0.1:6259/daemon";
+    public static final String WORMHOLE_URL2 = "http://127.0.0.1:40310";
+    public static final String WORMHOLE_URL3 = "http://127.0.0.1:6259";
+
     /**
      * 线程池
      */
     private static ExecutorService mExec = Executors.newCachedThreadPool();
-
-    private static CheckWormHole mCheckWormHole;
 
     private CheckWormHole() {
 
@@ -75,11 +83,6 @@ public class CheckWormHole {
             mExec.execute(getCheckRunnable(urlStr, callback));
         }
     }
-
-    public static final String WORMHOLE_URL0 = "http://127.0.0.1:40310/daemon";
-    public static final String WORMHOLE_URL1 = "http://127.0.0.1:6259/daemon";
-    public static final String WORMHOLE_URL2 = "http://127.0.0.1:40310";
-    public static final String WORMHOLE_URL3 = "http://127.0.0.1:6259";
 
     /**
      * 获取默认的WormHole Url List
@@ -121,11 +124,12 @@ public class CheckWormHole {
                     conn = (HttpURLConnection) url.openConnection();
                     conn.setDoInput(true);
                     conn.setDoOutput(true);
+                    conn.setUseCaches(false);
                     conn.connect();
                     StringBuilder stringBuilder = new StringBuilder();
                     int responseCode = conn.getResponseCode();
                     if (responseCode != HttpURLConnection.HTTP_NOT_FOUND) {
-                        inputStreamReader = new InputStreamReader(conn.getInputStream());
+                        inputStreamReader = new InputStreamReader(conn.getInputStream(), DEFAULT_CHARSET);
                         reader = new BufferedReader(inputStreamReader);
                         String line;
                         while ((line = reader.readLine()) != null) {
@@ -142,6 +146,7 @@ public class CheckWormHole {
                             reader.close();
                         } catch (IOException e) {
                             e.printStackTrace();
+                            Log.e(TAG, "BufferReader IOException: " + e.getMessage());
                         }
                     }
                     if (inputStreamReader != null) {
@@ -149,6 +154,7 @@ public class CheckWormHole {
                             inputStreamReader.close();
                         } catch (IOException e) {
                             e.printStackTrace();
+                            Log.e(TAG, "InputStreamReader IOException: " + e.getMessage());
                         }
                     }
                 }
@@ -165,10 +171,13 @@ public class CheckWormHole {
      */
     @Deprecated
     public static List<String> getAppName(String message) {
+        if (message == null || message.isEmpty()) {
+            return null;
+        }
         String[] split = message.split(",");
         List<String> list = new ArrayList<>();
         Map<String, String> map = getKeywordsMap();
-        for (String str : list) {
+        for (String str : split) {
             for (Map.Entry<String, String> entry : map.entrySet()) {
                 if (str.equals(entry.getKey())) {
                     list.add(entry.getValue());
@@ -212,19 +221,21 @@ public class CheckWormHole {
             case HttpURLConnection.HTTP_NOT_FOUND:
                 return false;
             default:
-                return false;
+                // 只要不是返回404默认都是危险
+                return true;
         }
     }
 
     /**
      * 回调接口
      */
-    public static interface Callback {
+    public interface Callback {
         /**
          * 检测结果的回调方法。
          *
          * @param url        检测的url
-         * @param resultCode 返回值，理论上返回只要不是{@link HttpURLConnection#HTTP_NOT_FOUND}都可能存在危险，实际测试百度后门返回是{@link HttpURLConnection#HTTP_OK}
+         * @param resultCode 返回值，理论上返回只要不是{@link HttpURLConnection#HTTP_NOT_FOUND}都可能存在危险，
+         *                   实际测试百度后门返回是{@link HttpURLConnection#HTTP_OK}，可以通过{@link #isDangerous(int)}方法来判断是否危险。
          * @param message    返回页面内容
          */
         void wormHoleCheckResult(String url, int resultCode, String message);
